@@ -1,0 +1,75 @@
+{% extends 'base.html'%}
+
+{%block content%}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <style>
+        body{
+            text-align: center;
+        }
+    </style>
+
+    <h3>Enter details to Login</h3>
+    <form action="login" method="post">
+        {%csrf_token%}
+        Username : <input type='text' name='username' id='username'><br><br>
+        Password : <input type='password' name='pass' id='pass'><br><br>
+        <input type='button' value='Login' id='btn1'>
+        <span id='spanerror' style="color: red;"></span>
+    </form>
+ 
+
+    <br><br>
+    <form action="signup" method="get">
+       
+      <h3> Don't have an account? </h3><input type='submit' value='Sign Up'>
+    </form>
+
+    
+</body>
+</html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    $('#btn1').click(()=>{
+        var username=$('#username').val()
+        var pass=$('#pass').val()
+        var data={
+            'csrfmiddlewaretoken':'{{csrf_token}}',
+            'username':username,
+            'pass':pass
+        }
+        if(username==''){
+            $('#spanerror').html('Enter valid username')
+        }
+        else if(pass==''){
+            $('#spanerror').html('Enter valid password')
+        }
+        else{
+            $.ajax({
+                url:'login',
+                method:'POST',
+                data: data,
+                dataType:'json',
+                success:function(data){
+                    if(data.success){
+                        
+                       window.location.replace('/display')
+                     }
+                    else{
+                        $('#spanerror').html('Invalid Credentials')
+                     }
+                 }  
+            })
+        }
+    })
+</script>
+{%endblock%}
