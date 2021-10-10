@@ -16,6 +16,8 @@ def color(request):
 
 
 def login(request):
+    if 'username' in request.session:
+        return redirect('display')
     if request.method=='POST':
         username=request.POST['username']
         password=request.POST['pass']
@@ -23,8 +25,7 @@ def login(request):
         user=auth.authenticate(username=username,password=password)
 
         if user is not None:
-            auth.login(request,user)
-            
+            request.session['username'] = username
             return JsonResponse(
                 {'success':True},
                 safe=False
@@ -85,8 +86,6 @@ def add_donor(request):
 
         doner=Doner.objects.create(name=name,age=age,bloodgroup=blood,phno=phno)
         doner.save();
-
-        
         persons=Doner.objects.all()
         return render(request,'display.html',{'persons':persons})
     
@@ -96,9 +95,12 @@ def add_donor(request):
 
 def display(request):
     persons=Doner.objects.all()
-    return render(request,'display.html',{'persons':persons})
+    if 'username' in request.session:
+        return render(request,'display.html',{'persons':persons})
+    return redirect(login)
 
 
 def logout(request):
-    auth.logout(request)
+    if 'username' in request.session:
+        return redirect('display')
     return redirect('login')
